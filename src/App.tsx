@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import emailjs from '@emailjs/browser';
 import { 
   Award, 
   Briefcase, 
@@ -20,6 +21,18 @@ import {
   Linkedin,
   ArrowUpRight
 } from 'lucide-react';
+
+// Shared Content for Modals
+const policyContent = {
+  privacy: {
+    title: "Privacy Policy",
+    text: "Your privacy is of utmost importance. As an executive mentorship service, I handle all personal information with strict confidentiality. Any data collected through this website—including your name, contact details, and professional goals—is used solely for the purpose of scheduling and conducting our mentoring sessions. We do not sell, trade, or otherwise transfer your information to third parties. Your data is protected using industry-standard security measures and is retained only as long as necessary to fulfill the service requested."
+  },
+  terms: {
+    title: "Terms of Service",
+    text: "By booking a session, you agree to engage in a professional mentorship relationship based on mutual respect and confidentiality. Mentorship advice is based on professional experience and is intended for guidance purposes only; the implementation of any strategies discussed is at the mentee's discretion. Cancellations or rescheduling requests should be made at least 24 hours in advance. We reserve the right to decline mentorship requests that fall outside our areas of expertise or professional standards."
+  }
+};
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,32 +60,22 @@ const Navbar = () => {
           <span className="text-xl md:text-2xl font-bold uppercase tracking-widest hidden sm:block text-brand-navy">Renu Narvekar</span>
         </div>
 
-        {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-12">
           {navLinks.map((link) => (
-            <a 
-              key={link.name} 
-              href={link.href} 
-              className="text-lg md:text-xl font-bold text-brand-navy/80 hover:text-brand-gold transition-colors"
-            >
+            <a key={link.name} href={link.href} className="text-lg md:text-xl font-bold text-brand-navy/80 hover:text-brand-gold transition-colors">
               {link.name}
             </a>
           ))}
-          <a 
-            href="#contact" 
-            className="bg-brand-navy text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-brand-gold transition-all shadow-lg shadow-brand-navy/10"
-          >
+          <a href="#contact" className="bg-brand-navy text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-brand-gold transition-all shadow-lg shadow-brand-navy/10">
             Book a Session
           </a>
         </div>
 
-        {/* Mobile Toggle */}
         <button className="md:hidden text-brand-navy" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <X /> : <Menu />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div 
@@ -82,20 +85,11 @@ const Navbar = () => {
             className="absolute top-full left-0 w-full bg-white border-b border-zinc-100 p-6 flex flex-col gap-4 md:hidden shadow-xl"
           >
             {navLinks.map((link) => (
-              <a 
-                key={link.name} 
-                href={link.href} 
-                onClick={() => setIsOpen(false)}
-                className="text-lg font-bold py-2 border-b border-zinc-50 text-brand-navy"
-              >
+              <a key={link.name} href={link.href} onClick={() => setIsOpen(false)} className="text-lg font-bold py-2 border-b border-zinc-50 text-brand-navy">
                 {link.name}
               </a>
             ))}
-            <a 
-              href="#contact" 
-              onClick={() => setIsOpen(false)}
-              className="bg-brand-navy text-white px-6 py-4 rounded-xl text-center font-bold mt-2"
-            >
+            <a href="#contact" onClick={() => setIsOpen(false)} className="bg-brand-navy text-white px-6 py-4 rounded-xl text-center font-bold mt-2">
               Book a Session
             </a>
           </motion.div>
@@ -110,11 +104,7 @@ const Hero = () => {
     <section className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-brand-sand">
       <div className="absolute top-0 right-0 w-1/2 h-full bg-brand-navy/5 -z-10 hidden lg:block"></div>
       <div className="max-w-7xl mx-auto px-6 md:px-12 grid lg:grid-cols-2 gap-12 items-center">
-        <motion.div 
-          initial={{ opacity: 0, x: -30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-        >
+        <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-gold/10 text-brand-gold text-xs font-bold uppercase tracking-widest mb-6 border border-brand-gold/20">
             <TrendingUp size={14} />
             Executive Career Mentorship
@@ -138,26 +128,14 @@ const Hero = () => {
             </a>
           </div>
         </motion.div>
-
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative py-12"
-        >
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.2 }} className="relative py-12">
           <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl relative border-8 border-white">
-            <img 
-              src="https://picsum.photos/seed/executive-woman/800/1000" 
-              alt="Ms. Renu Narvekar" 
-              className="w-full h-full object-cover transition-all duration-700"
-              referrerPolicy="no-referrer"
-            />
+            <img src="https://picsum.photos/seed/executive-woman/800/1000" alt="Ms. Renu Narvekar" className="w-full h-full object-cover transition-all duration-700" referrerPolicy="no-referrer" />
             <div className="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-brand-navy to-transparent text-white">
               <p className="text-sm font-bold uppercase tracking-widest opacity-80 mb-1">Ms. Renu Narvekar</p>
-              <p className="text-xl font-serif italic">Ex MD & Regional Tax Head – India & South Asia</p>
+              <p className="text-xl font-serif italic">Ex - Managing Director | Global & Regional Tax Leader</p>
             </div>
           </div>
-          {/* Decorative elements */}
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-brand-gold rounded-full -z-10 blur-3xl opacity-20"></div>
           <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-brand-navy rounded-full -z-10 blur-[100px] opacity-10"></div>
         </motion.div>
@@ -168,30 +146,10 @@ const Hero = () => {
 
 const Experience = () => {
   const experiences = [
-    {
-      company: "Standard Chartered Bank",
-      role: "MD & Regional Tax Lead – India & South Asia",
-      period: "Current",
-      description: "Leading multi-functional teams across diverse markets and geographies."
-    },
-    {
-      company: "Tata Consultancy Services (TCS)",
-      role: "Vice President & Global Head – Taxation",
-      period: "Prior to SCB",
-      description: "Global leadership for an Indian multinational operating in 46 countries."
-    },
-    {
-      company: "HSBC UK & Europe",
-      role: "Regional Head of Tax",
-      period: "London Based",
-      description: "Led a team of 60 tax professionals and served as Global Lead for Transfer Pricing."
-    },
-    {
-      company: "Procter & Gamble",
-      role: "Group Manager & Head Taxation (India)",
-      period: "1990 - 2006",
-      description: "Built a foundational career in tax leadership over 16 transformative years."
-    }
+    { company: "Standard Chartered Bank", role: "MD & Regional Tax Lead – India & South Asia", period: "Most Recent", description: "Leading multi-functional teams across diverse markets and geographies." },
+    { company: "Tata Consultancy Services (TCS)", role: "Vice President & Global Head – Taxation", period: "Prior to SCB", description: "Global leadership for an Indian multinational operating in 46 countries." },
+    { company: "HSBC UK & Europe", role: "Regional Head of Tax", period: "London Based", description: "Led a team of 60 tax professionals and served as Global Lead for Transfer Pricing." },
+    { company: "Procter & Gamble", role: "Group Manager & Head Taxation (India)", period: "1990 - 2006", description: "Built a foundational career in tax leadership over 16 transformative years." }
   ];
 
   return (
@@ -200,40 +158,22 @@ const Experience = () => {
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-1">
             <h2 className="font-serif text-4xl mb-6 text-brand-navy">Decades of <br /><span className="italic text-brand-gold">Global Leadership</span></h2>
-            <p className="text-brand-navy/60 mb-8 font-medium">
-              A career spanning three decades across marquee global organizations, advising on M&A, structuring, and policy.
-            </p>
+            <p className="text-brand-navy/60 mb-8 font-medium">A career spanning three decades across marquee global organizations, advising on M&A, structuring, and policy.</p>
             <div className="space-y-4">
-              <div className="flex items-center gap-3 text-sm font-bold text-brand-navy">
-                <CheckCircle2 className="text-brand-gold" size={18} />
-                Qualified Chartered Accountant
-              </div>
-              <div className="flex items-center gap-3 text-sm font-bold text-brand-navy">
-                <CheckCircle2 className="text-brand-gold" size={18} />
-                University of Bombay Alumna
-              </div>
-              <div className="flex items-center gap-3 text-sm font-bold text-brand-navy">
-                <CheckCircle2 className="text-brand-gold" size={18} />
-                ITR Asia Tax Award Winner
-              </div>
+              <div className="flex items-center gap-3 text-sm font-bold text-brand-navy"><CheckCircle2 className="text-brand-gold" size={18} />Qualified Chartered Accountant</div>
+              <div className="flex items-center gap-3 text-sm font-bold text-brand-navy"><CheckCircle2 className="text-brand-gold" size={18} />University of Bombay Alumna</div>
+              <div className="flex items-center gap-3 text-sm font-bold text-brand-navy"><CheckCircle2 className="text-brand-gold" size={18} />ITR Asia Tax Award Winner</div>
             </div>
           </div>
-          
           <div className="lg:col-span-2 space-y-6">
             {experiences.map((exp, idx) => (
-              <motion.div 
-                key={idx}
-                whileHover={{ y: -5 }}
-                className="bg-brand-sand p-8 rounded-3xl border border-brand-navy/5 shadow-sm flex flex-col md:flex-row justify-between gap-4"
-              >
+              <motion.div key={idx} whileHover={{ y: -5 }} className="bg-brand-sand p-8 rounded-3xl border border-brand-navy/5 shadow-sm flex flex-col md:flex-row justify-between gap-4">
                 <div>
                   <h3 className="text-xl font-bold mb-1 text-brand-navy">{exp.company}</h3>
                   <p className="text-brand-gold font-bold mb-3 uppercase text-xs tracking-widest">{exp.role}</p>
                   <p className="text-brand-navy/70 text-sm leading-relaxed font-medium">{exp.description}</p>
                 </div>
-                <div className="text-xs font-black text-brand-navy/30 whitespace-nowrap uppercase tracking-tighter">
-                  {exp.period}
-                </div>
+                <div className="text-xs font-black text-brand-navy/30 whitespace-nowrap uppercase tracking-tighter">{exp.period}</div>
               </motion.div>
             ))}
           </div>
@@ -245,47 +185,26 @@ const Experience = () => {
 
 const Mentoring = () => {
   const areas = [
-    {
-      title: "Career Growth and Strategy",
-      icon: <Users className="text-brand-gold" />,
-      description: "Developing the leadership mindset and communication skills required for boardroom success."
-    },
-    {
-      title: "Executive Presence",
-      icon: <Award className="text-brand-gold" />,
-      description: "Navigating transitions from technical roles to global leadership and managing international relocations."
-    },
-    {
-      title: "Leadership",
-      icon: <Globe className="text-brand-gold" />,
-      description: "Learning to lead multi-disciplinary teams and represent organizational interests in global forums."
-    },
-    {
-      title: "Strategic Advisory",
-      icon: <BookOpen className="text-brand-gold" />,
-      description: "Comprehensive career counselling and strategic advice tailored to your professional trajectory."
-    }
+    { title: "Career Growth and Strategy", icon: <Users className="text-brand-gold" />, description: "Developing the leadership mindset and communication skills required for boardroom success." },
+    { title: "Executive Presence", icon: <Award className="text-brand-gold" />, description: "Navigating transitions from technical roles to global leadership and managing international relocations." },
+    { title: "Leadership", icon: <Globe className="text-brand-gold" />, description: "Learning to lead multi-disciplinary teams and represent organizational interests in global forums." },
+    { title: "Strategic Advisory", icon: <BookOpen className="text-brand-gold" />, description: "Comprehensive career counselling and strategic advice tailored to your professional trajectory." }
   ];
 
   return (
     <section id="mentoring" className="section-padding bg-brand-sand">
       <div className="max-w-7xl mx-auto text-center mb-16">
         <h2 className="font-serif text-4xl md:text-5xl mb-4 text-brand-navy">Mentorship <span className="italic text-brand-gold">Focus</span></h2>
-        <p className="text-brand-navy/60 max-w-2xl mx-auto font-medium">
-          Personalized guidance for professionals aiming to transition from technical expertise to strategic global leadership.
-        </p>
+        <p className="text-brand-navy/60 max-w-2xl mx-auto font-medium">Personalized guidance for professionals aiming to transition from technical expertise to strategic global leadership.</p>
       </div>
-
       <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-8">
         {areas.map((area, idx) => (
           <div key={idx} className="p-8 rounded-[2rem] bg-white border border-brand-navy/5 hover:border-brand-gold/30 hover:shadow-2xl transition-all group">
             <div className="w-14 h-14 bg-brand-sand rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand-gold group-hover:text-white transition-all">
-              {React.cloneElement(area.icon as React.ReactElement, { size: 28 })}
+              {React.cloneElement(area.icon, { size: 28 })}
             </div>
             <h3 className="text-xl font-bold mb-4 text-brand-navy">{area.title}</h3>
-            <p className="text-brand-navy/60 text-sm leading-relaxed font-medium">
-              {area.description}
-            </p>
+            <p className="text-brand-navy/60 text-sm leading-relaxed font-medium">{area.description}</p>
           </div>
         ))}
       </div>
@@ -300,43 +219,27 @@ const About = () => {
       <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
         <div className="relative">
           <div className="aspect-square rounded-[2.5rem] overflow-hidden border-4 border-white/10 shadow-2xl">
-            <img 
-              src="https://picsum.photos/seed/mentor-session/800/800" 
-              alt="Professional Mentorship" 
-              className="w-full h-full object-cover"
-              referrerPolicy="no-referrer"
-            />
+            <img src="https://picsum.photos/seed/mentor-session/800/800" alt="Professional Mentorship" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
           </div>
           <div className="absolute -bottom-8 -right-8 bg-brand-gold p-10 rounded-3xl shadow-2xl hidden md:block">
             <p className="text-5xl font-serif italic mb-1 text-brand-navy">30+</p>
             <p className="text-xs uppercase tracking-widest font-black text-brand-navy">Years of Impact</p>
           </div>
         </div>
-
         <div>
           <h2 className="font-serif text-4xl md:text-5xl mb-8">The Mentor: <br /><span className="italic text-brand-gold">Renu Narvekar</span></h2>
           <div className="space-y-6 text-white/70 leading-relaxed font-medium text-justify">
-            <p>
-              Renu is a qualified Chartered Accountant and Ex MD & Regional Tax Head, with a career defined by leading multi-disciplinary teams across 46 countries.
-            </p>
-            <p>
-              From her 16-year tenure at P&G to leading HSBC's UK & Europe tax function in London, Renu has mastered the complexities of global leadership and career navigation in high-stakes environments.
-            </p>
-            <p>
-              As the co-chair of the Bombay Chamber of Commerce and Industry Tax Committee and an active OECD participant, she brings a unique blend of technical mastery and strategic policy insight to her mentees.
-            </p>
+            <p>Renu is a qualified Chartered Accountant and a Global and Regional Tax Leader, with a career defined by leading multi-disciplinary teams across 46 countries.</p>
+            <p>Renu brings over three decades of global tax leadership experience across leading organizations including Procter & Gamble, Standard Chartered, HSBC (India and UK), and Tata Consultancy Services. Her last tenure was at Standard Chartered Bank, where she served as MD & Regional Tax Lead – India & South Asia, driving complex tax strategies, regulatory engagement, and large cross-border teams across diverse industries and geographies.</p>
+            <p>As the co-chair of the Bombay Chamber of Commerce and Industry Tax Committee and an active OECD participant, she brings a unique blend of technical mastery and strategic policy insight to her mentees.</p>
           </div>
           <div className="mt-10 flex flex-wrap gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10">
-                <Award size={24} className="text-brand-gold" />
-              </div>
+              <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10"><Award size={24} className="text-brand-gold" /></div>
               <span className="text-sm font-bold uppercase tracking-wider">ITR Asia Tax Award</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10">
-                <Briefcase size={24} className="text-brand-gold" />
-              </div>
+              <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10"><Briefcase size={24} className="text-brand-gold" /></div>
               <span className="text-sm font-bold uppercase tracking-wider">Bombay Chamber Co-Chair</span>
             </div>
           </div>
@@ -347,76 +250,97 @@ const About = () => {
 };
 
 const BookSession = () => {
+  const form = useRef();
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+
+  // Trigger Terms Modal first
+  const handleBooking = (e) => {
+    e.preventDefault();
+    setShowTermsModal(true);
+  };
+
+  // Actual Email Submission after Terms Acceptance
+  const confirmAndSend = () => {
+    setIsSending(true);
+    emailjs.sendForm('service_2nbys7j', 'template_if845bn', form.current, 'abXR9VVmw4qIl9CL_')
+      .then(() => {
+          form.current.reset();
+          setShowTermsModal(false);
+          setIsSending(false);
+          setShowSuccessModal(true); // Open Custom Success Box
+      }, (error) => {
+          alert("Failed to send booking request. Please contact narvekarr7@hotmail.com directly.");
+          console.error('EmailJS Error:', error);
+          setIsSending(false);
+      });
+  };
+
   return (
     <section id="contact" className="section-padding bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="bg-[#121E2A] rounded-[4rem] p-8 md:p-20 text-white grid lg:grid-cols-2 gap-16 items-center border border-white/5 shadow-2xl">
           <div>
             <h2 className="font-serif text-4xl md:text-6xl mb-6">Book Your <br /><span className="italic text-brand-gold">Mentoring Session.</span></h2>
-            <p className="text-white/70 mb-10 text-lg font-medium leading-relaxed">
-              Mentorship is the shortcut to wisdom. Secure your session to discuss how we can accelerate your leadership journey.
-            </p>
+            <p className="text-white/70 mb-10 text-lg font-medium leading-relaxed">Mentorship is the shortcut to wisdom. Secure your session to discuss how we can accelerate your leadership journey.</p>
             <div className="space-y-8">
               <div className="flex items-center gap-5">
-                <div className="w-14 h-14 rounded-2xl bg-brand-gold text-brand-navy flex items-center justify-center shadow-lg">
-                  <Mail size={24} />
-                </div>
+                <div className="w-14 h-14 rounded-2xl bg-brand-gold text-brand-navy flex items-center justify-center shadow-lg"><Mail size={24} /></div>
                 <div>
                   <p className="text-xs uppercase tracking-widest font-black text-brand-gold/80">Direct Inquiry</p>
                   <p className="font-bold text-xl">narvekarr7@hotmail.com</p>
                 </div>
               </div>
               <div className="flex items-center gap-5">
-                <div className="w-14 h-14 rounded-2xl bg-brand-gold text-brand-navy flex items-center justify-center shadow-lg">
-                  <Linkedin size={24} />
-                </div>
+                <div className="w-14 h-14 rounded-2xl bg-brand-gold text-brand-navy flex items-center justify-center shadow-lg"><Linkedin size={24} /></div>
                 <div>
                   <p className="text-xs uppercase tracking-widest font-black text-brand-gold/80">Professional Network</p>
-                  <p className="font-bold text-xl">renu-narvekar-leadership</p>
+                  <a href="https://www.linkedin.com/in/renunarvekar" target="_blank" rel="noopener noreferrer" className="font-bold text-xl hover:text-brand-gold transition-all">renu-narvekar-leadership</a>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="bg-white rounded-[2.5rem] p-10 text-brand-navy shadow-2xl border border-brand-navy/5">
-            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+            <form ref={form} className="space-y-6" onSubmit={handleBooking}>
               <div className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-brand-navy/40">First Name</label>
-                  <input type="text" className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold" placeholder="Jane" />
+                  <input name="first_name" required type="text" className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold" placeholder="Pankaj" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-brand-navy/40">Last Name</label>
-                  <input type="text" className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold" placeholder="Doe" />
+                  <input name="last_name" required type="text" className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold" placeholder="Samant" />
                 </div>
               </div>
               <div className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-brand-navy/40">Email Address</label>
-                  <input type="email" className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold" placeholder="jane.doe@executive.com" />
+                  <input name="user_email" required type="email" className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold" placeholder="pankaj.samant@executive.com" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-brand-navy/40">Phone Number</label>
-                  <input type="tel" className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold" placeholder="+91 98765 43210" />
+                  <input name="phone" required type="tel" className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold" placeholder="+91 98765 xxxxx" />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-black uppercase tracking-widest text-brand-navy/40">Suitable Slots (Date & Time)</label>
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <input type="text" className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold text-sm" placeholder="Slot 1: e.g. Oct 25, 4PM" />
-                  <input type="text" className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold text-sm" placeholder="Slot 2: e.g. Oct 27, 11AM" />
+                  <input name="slot_1" required type="datetime-local" className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold text-sm" />
+                  <input name="slot_2" required type="datetime-local" className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold text-sm" />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-black uppercase tracking-widest text-brand-navy/40">Mentorship Goal</label>
-                <select className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold appearance-none">
+                <select name="goal" required className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold appearance-none">
                   <option>Career Strategy & Growth</option>
                   <option>Executive Leadership Presence</option>
                   <option>Global Role Transition</option>
                   <option>Technical Leadership in Tax</option>
                 </select>
               </div>
-              <button className="w-full bg-brand-navy text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-brand-gold transition-all flex items-center justify-center gap-3 shadow-xl shadow-brand-navy/20">
+              <button type="submit" className="w-full bg-brand-navy text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-brand-gold transition-all flex items-center justify-center gap-3 shadow-xl shadow-brand-navy/20">
                 Confirm Booking
                 <ArrowUpRight size={20} />
               </button>
@@ -424,11 +348,61 @@ const BookSession = () => {
           </div>
         </div>
       </div>
+
+      {/* Booking Terms Acceptance Modal */}
+      <AnimatePresence>
+        {showTermsModal && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-brand-navy/60 backdrop-blur-md">
+            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="bg-white rounded-[2rem] p-8 md:p-12 max-w-2xl w-full shadow-2xl relative">
+              <button onClick={() => setShowTermsModal(false)} className="absolute top-6 right-6 p-2 rounded-full hover:bg-brand-sand transition-colors text-brand-navy"><X size={24} /></button>
+              <h3 className="font-serif text-3xl mb-6 text-brand-navy">Accept Terms to Confirm</h3>
+              <div className="text-brand-navy/70 leading-relaxed font-medium text-justify mb-8">
+                {policyContent.terms.text}
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button 
+                  onClick={confirmAndSend} 
+                  disabled={isSending}
+                  className="flex-1 bg-brand-navy text-white py-4 rounded-xl font-bold hover:bg-brand-gold transition-all disabled:opacity-50"
+                >
+                  {isSending ? "Confirming..." : "Accept & Confirm Booking"}
+                </button>
+                <button onClick={() => setShowTermsModal(false)} className="flex-1 border-2 border-brand-navy/10 text-brand-navy py-4 rounded-xl font-bold hover:bg-brand-sand transition-all">Cancel</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Custom Success Modal */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-brand-navy/60 backdrop-blur-md">
+            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="bg-white rounded-[2rem] p-10 md:p-16 max-w-md w-full shadow-2xl text-center relative">
+              <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8">
+                <CheckCircle2 size={40} />
+              </div>
+              <h3 className="font-serif text-3xl mb-4 text-brand-navy">Thank You!</h3>
+              <p className="text-brand-navy/70 font-medium leading-relaxed mb-10">
+                Your session has been booked successfully. We will contact you soon!
+              </p>
+              <button 
+                onClick={() => setShowSuccessModal(false)} 
+                className="w-full bg-brand-navy text-white py-4 rounded-xl font-bold hover:bg-brand-gold transition-all shadow-lg"
+              >
+                Return to Site
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
 
 const Footer = () => {
+  const [modalContent, setModalContent] = useState(null);
+
   return (
     <footer className="py-16 px-6 bg-white border-t border-brand-navy/5">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
@@ -440,14 +414,27 @@ const Footer = () => {
           </div>
         </div>
         <div className="flex gap-10 text-xs font-black uppercase tracking-widest text-brand-navy/40">
-          <a href="#" className="hover:text-brand-gold transition-colors">Privacy</a>
-          <a href="#" className="hover:text-brand-gold transition-colors">Terms</a>
-          <a href="#" className="hover:text-brand-gold transition-colors">LinkedIn</a>
+          <button onClick={() => setModalContent(policyContent.privacy)} className="hover:text-brand-gold transition-colors">Privacy</button>
+          <button onClick={() => setModalContent(policyContent.terms)} className="hover:text-brand-gold transition-colors">Terms</button>
+          <a href="https://www.linkedin.com/in/renunarvekar" target="_blank" rel="noopener noreferrer" className="hover:text-brand-gold transition-colors">LinkedIn</a>
         </div>
-        <p className="text-xs font-bold text-brand-navy/30">
-          © {new Date().getFullYear()} Renu Narvekar. Professional Mentorship.
-        </p>
+        <p className="text-xs font-bold text-brand-navy/30">© {new Date().getFullYear()} Renu Narvekar. Professional Mentorship.</p>
       </div>
+
+      <AnimatePresence>
+        {modalContent && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-brand-navy/40 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="bg-white rounded-[2rem] p-8 md:p-12 max-w-2xl w-full shadow-2xl relative">
+              <button onClick={() => setModalContent(null)} className="absolute top-6 right-6 p-2 rounded-full hover:bg-brand-sand transition-colors text-brand-navy"><X size={24} /></button>
+              <h3 className="font-serif text-3xl mb-6 text-brand-navy">{modalContent.title}</h3>
+              <div className="text-brand-navy/70 leading-relaxed font-medium text-justify">
+                {modalContent.text}
+              </div>
+              <button onClick={() => setModalContent(null)} className="mt-10 w-full bg-brand-navy text-white py-4 rounded-xl font-bold hover:bg-brand-gold transition-all">Close</button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </footer>
   );
 };
