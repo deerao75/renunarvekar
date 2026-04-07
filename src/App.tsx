@@ -262,6 +262,7 @@ const BookSession = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [sessionType, setSessionType] = useState("First Session (₹1000)");
+  const [goalText, setGoalText] = useState("");
 
   const handleBooking = (e: React.FormEvent) => {
     e.preventDefault();
@@ -272,7 +273,7 @@ const BookSession = () => {
     const amount = sessionType === "First Session (₹1000)" ? 1000 : 2500;
     
     const options = {
-      key: "rzp_live_Saab60q2UURRe5", // YOUR KEY ID GOES HERE
+      key: "rzp_live_Saab60q2UURRe5", 
       amount: amount * 100, 
       currency: "INR",
       name: "Renu Narvekar Mentorship",
@@ -297,12 +298,14 @@ const BookSession = () => {
     const templateParams = {
       ...Object.fromEntries(new FormData(form.current!)),
       payment_id: paymentId,
-      session_type: sessionType
+      session_type: sessionType,
+      goal: goalText // This maps to {{goal}} in your EmailJS template
     };
 
     emailjs.send('service_2nbys7j', 'template_if845bn', templateParams, 'abXR9VVmw4qIl9CL_')
       .then(() => {
           form.current?.reset();
+          setGoalText("");
           setShowTermsModal(false);
           setIsProcessing(false);
           setShowSuccessModal(true);
@@ -374,13 +377,21 @@ const BookSession = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-widest text-brand-navy/40">Mentorship Goal</label>
-                <select name="goal" required className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold appearance-none">
-                  <option>Career Strategy & Growth</option>
-                  <option>Executive Leadership Presence</option>
-                  <option>Global Role Transition</option>
-                  <option>Technical Leadership in Tax</option>
-                </select>
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-black uppercase tracking-widest text-brand-navy/40">Mentorship Goal</label>
+                  <span className={`text-[10px] font-bold ${goalText.length > 90 ? 'text-red-500' : 'text-brand-navy/40'}`}>
+                    {goalText.length}/100
+                  </span>
+                </div>
+                <textarea 
+                  name="goal" 
+                  required 
+                  maxLength={100}
+                  value={goalText}
+                  onChange={(e) => setGoalText(e.target.value)}
+                  placeholder="Tell me what specific aspect of leadership or career strategy you want to focus on..."
+                  className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold resize-none h-24"
+                />
               </div>
               <button type="submit" className="w-full bg-brand-navy text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-brand-gold transition-all flex items-center justify-center gap-3 shadow-xl shadow-brand-navy/20">
                 Confirm Booking
