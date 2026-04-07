@@ -22,6 +22,13 @@ import {
   ArrowUpRight
 } from 'lucide-react';
 
+// Tells TypeScript that Razorpay is attached to the window object
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 // Shared Content for Modals
 const policyContent = {
   privacy: {
@@ -201,7 +208,7 @@ const Mentoring = () => {
         {areas.map((area, idx) => (
           <div key={idx} className="p-8 rounded-[2rem] bg-white border border-brand-navy/5 hover:border-brand-gold/30 hover:shadow-2xl transition-all group">
             <div className="w-14 h-14 bg-brand-sand rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand-gold group-hover:text-white transition-all">
-              {React.cloneElement(area.icon, { size: 28 })}
+              {React.cloneElement(area.icon as React.ReactElement, { size: 28 })}
             </div>
             <h3 className="text-xl font-bold mb-4 text-brand-navy">{area.title}</h3>
             <p className="text-brand-navy/60 text-sm leading-relaxed font-medium">{area.description}</p>
@@ -250,30 +257,58 @@ const About = () => {
 };
 
 const BookSession = () => {
-  const form = useRef();
+  const form = useRef<HTMLFormElement>(null);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [isSending, setIsSending] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [sessionType, setSessionType] = useState("First Session (₹1000)");
 
-  // Trigger Terms Modal first
-  const handleBooking = (e) => {
+  const handleBooking = (e: React.FormEvent) => {
     e.preventDefault();
     setShowTermsModal(true);
   };
 
-  // Actual Email Submission after Terms Acceptance
-  const confirmAndSend = () => {
-    setIsSending(true);
-    emailjs.sendForm('service_2nbys7j', 'template_if845bn', form.current, 'abXR9VVmw4qIl9CL_')
+  const confirmAndPay = () => {
+    const amount = sessionType === "First Session (₹1000)" ? 1000 : 2500;
+    
+    const options = {
+      key: "rzp_live_Saab60q2UURRe5", // YOUR KEY ID GOES HERE
+      amount: amount * 100, 
+      currency: "INR",
+      name: "Renu Narvekar Mentorship",
+      description: `Payment for ${sessionType}`,
+      handler: function (response: any) {
+        sendConfirmationEmail(response.razorpay_payment_id);
+      },
+      prefill: {
+        name: `${form.current?.first_name.value} ${form.current?.last_name.value}`,
+        email: form.current?.user_email.value,
+        contact: form.current?.phone.value,
+      },
+      theme: { color: "#121E2A" },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
+  const sendConfirmationEmail = (paymentId: string) => {
+    setIsProcessing(true);
+    const templateParams = {
+      ...Object.fromEntries(new FormData(form.current!)),
+      payment_id: paymentId,
+      session_type: sessionType
+    };
+
+    emailjs.send('service_2nbys7j', 'template_if845bn', templateParams, 'abXR9VVmw4qIl9CL_')
       .then(() => {
-          form.current.reset();
+          form.current?.reset();
           setShowTermsModal(false);
-          setIsSending(false);
-          setShowSuccessModal(true); // Open Custom Success Box
+          setIsProcessing(false);
+          setShowSuccessModal(true);
       }, (error) => {
-          alert("Failed to send booking request. Please contact narvekarr7@hotmail.com directly.");
-          console.error('EmailJS Error:', error);
-          setIsSending(false);
+          alert("Payment received, but booking alert failed. Please contact narvekarr7@hotmail.com with your payment ID.");
+          setIsProcessing(false);
       });
   };
 
@@ -325,6 +360,13 @@ const BookSession = () => {
                 </div>
               </div>
               <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-brand-navy/40">Session Type & Fee</label>
+                <select value={sessionType} onChange={(e) => setSessionType(e.target.value)} className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold appearance-none">
+                  <option>First Session (₹1000)</option>
+                  <option>Subsequent Session (₹2500)</option>
+                </select>
+              </div>
+              <div className="space-y-2">
                 <label className="text-xs font-black uppercase tracking-widest text-brand-navy/40">Suitable Slots (Date & Time)</label>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <input name="slot_1" required type="datetime-local" className="w-full px-5 py-4 rounded-2xl bg-brand-sand/50 border border-brand-navy/5 focus:outline-none focus:ring-4 focus:ring-brand-gold/10 focus:border-brand-gold transition-all font-bold text-sm" />
@@ -349,23 +391,19 @@ const BookSession = () => {
         </div>
       </div>
 
-      {/* Booking Terms Acceptance Modal */}
       <AnimatePresence>
         {showTermsModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-brand-navy/60 backdrop-blur-md">
             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="bg-white rounded-[2rem] p-8 md:p-12 max-w-2xl w-full shadow-2xl relative">
               <button onClick={() => setShowTermsModal(false)} className="absolute top-6 right-6 p-2 rounded-full hover:bg-brand-sand transition-colors text-brand-navy"><X size={24} /></button>
-              <h3 className="font-serif text-3xl mb-6 text-brand-navy">Accept Terms to Confirm</h3>
+              <h3 className="font-serif text-3xl mb-6 text-brand-navy">Accept Terms & Pay</h3>
               <div className="text-brand-navy/70 leading-relaxed font-medium text-justify mb-8">
                 {policyContent.terms.text}
+                <p className="mt-4 font-bold text-brand-navy">Amount to be paid: {sessionType.split('(')[1].replace(')', '')}</p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
-                <button 
-                  onClick={confirmAndSend} 
-                  disabled={isSending}
-                  className="flex-1 bg-brand-navy text-white py-4 rounded-xl font-bold hover:bg-brand-gold transition-all disabled:opacity-50"
-                >
-                  {isSending ? "Confirming..." : "Accept & Confirm Booking"}
+                <button onClick={confirmAndPay} disabled={isProcessing} className="flex-1 bg-brand-navy text-white py-4 rounded-xl font-bold hover:bg-brand-gold transition-all disabled:opacity-50">
+                  {isProcessing ? "Processing..." : "Accept & Pay Now"}
                 </button>
                 <button onClick={() => setShowTermsModal(false)} className="flex-1 border-2 border-brand-navy/10 text-brand-navy py-4 rounded-xl font-bold hover:bg-brand-sand transition-all">Cancel</button>
               </div>
@@ -374,7 +412,6 @@ const BookSession = () => {
         )}
       </AnimatePresence>
 
-      {/* Custom Success Modal */}
       <AnimatePresence>
         {showSuccessModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-brand-navy/60 backdrop-blur-md">
@@ -382,16 +419,9 @@ const BookSession = () => {
               <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8">
                 <CheckCircle2 size={40} />
               </div>
-              <h3 className="font-serif text-3xl mb-4 text-brand-navy">Thank You!</h3>
-              <p className="text-brand-navy/70 font-medium leading-relaxed mb-10">
-                Your session has been booked successfully. We will contact you soon!
-              </p>
-              <button 
-                onClick={() => setShowSuccessModal(false)} 
-                className="w-full bg-brand-navy text-white py-4 rounded-xl font-bold hover:bg-brand-gold transition-all shadow-lg"
-              >
-                Return to Site
-              </button>
+              <h3 className="font-serif text-3xl mb-4 text-brand-navy">Payment Successful!</h3>
+              <p className="text-brand-navy/70 font-medium leading-relaxed mb-10">Your session has been booked successfully. We will contact you soon!</p>
+              <button onClick={() => setShowSuccessModal(false)} className="w-full bg-brand-navy text-white py-4 rounded-xl font-bold hover:bg-brand-gold transition-all shadow-lg">Return to Site</button>
             </motion.div>
           </motion.div>
         )}
@@ -401,7 +431,7 @@ const BookSession = () => {
 };
 
 const Footer = () => {
-  const [modalContent, setModalContent] = useState(null);
+  const [modalContent, setModalContent] = useState<any>(null);
 
   return (
     <footer className="py-16 px-6 bg-white border-t border-brand-navy/5">
@@ -427,9 +457,7 @@ const Footer = () => {
             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="bg-white rounded-[2rem] p-8 md:p-12 max-w-2xl w-full shadow-2xl relative">
               <button onClick={() => setModalContent(null)} className="absolute top-6 right-6 p-2 rounded-full hover:bg-brand-sand transition-colors text-brand-navy"><X size={24} /></button>
               <h3 className="font-serif text-3xl mb-6 text-brand-navy">{modalContent.title}</h3>
-              <div className="text-brand-navy/70 leading-relaxed font-medium text-justify">
-                {modalContent.text}
-              </div>
+              <div className="text-brand-navy/70 leading-relaxed font-medium text-justify">{modalContent.text}</div>
               <button onClick={() => setModalContent(null)} className="mt-10 w-full bg-brand-navy text-white py-4 rounded-xl font-bold hover:bg-brand-gold transition-all">Close</button>
             </motion.div>
           </motion.div>
